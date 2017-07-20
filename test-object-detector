@@ -1,0 +1,19 @@
+#!/usr/bin/python
+import os
+
+'''
+pos_path = "data/dataset/pos"
+neg_path = "data/dataset/neg"
+os.system("python detector/extract-features.py -p {} -n {}".format(pos_path, neg_path))
+
+pos_feat_path =  "data/features/pos"
+neg_feat_path =  "data/features/neg"
+os.system("python detector/train-classifier.py -p {} -n {}".format(pos_feat_path, neg_feat_path))
+'''
+test_im_path = "test/35.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+test_im_path = "test/37.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+

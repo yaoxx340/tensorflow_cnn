@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt"
+all_model_checkpoint_paths: "/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt"
