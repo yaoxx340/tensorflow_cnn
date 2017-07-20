@@ -31,44 +31,29 @@ def frange(x, y, jump):
     yield x
     x += jump
 
-def sliding_window(image, window_size,step_size):
-    #r = image[:,:,0]
-    #g = image[:,:,1]
-    #b = image[:,:,2]
-
-    halfx = (window_size[0]-1)/2
-    halfy = (window_size[1]-1)/2
-    for y in xrange(250, 730, step_size[1]):
-        for x in xrange(890, 1400, step_size[0]):
-            lstx = range(x-halfx, x+halfx+1)
-            lsty = range(y-halfy, y+halfy+1)
-            pts = []
-            for j in lsty:
-                for i in lstx:
-                    pts.append([i,j,1])
-            pts = np.transpose(pts)
-            for theta in frange(0, 6.28, 0.174):
-                transform = np.array([[np.cos(theta),-np.sin(theta),-x*np.cos(theta)+x+y*np.sin(theta)],[np.sin(theta),np.cos(theta),-x*np.sin(theta)-y*np.cos(theta)+y],[0,0,1]])
-                newp = fast_dot(transform,pts)
-                newp = newp[0:2,:]
-                newp = np.transpose(newp).astype(int).tolist()
-                new = []
-                #newr = []
-                #newg = []
-                #newb = []
-                for i in range(0,len(newp)):
-                    indx = newp[i][1]
-                    indy = newp[i][0]
-                    new.append(image[indx,indy])
-                    #newr.append(r[indx,indy])
-                    #newg.append(g[indx,indy])
-                    #newb.append(b[indx,indy])
-                #newrr=np.array(newr).reshape((window_size[1],window_size[0]))
-                #newgg=np.array(newg).reshape((window_size[1],window_size[0]))
-                #newbb=np.array(newb).reshape((window_size[1],window_size[0]))
-                #newim = np.dstack((newrr,newgg,newbb))
-                newim=np.array(new).reshape((window_size[1],window_size[0]))
-                yield (x, y, theta, newim)
+def sliding_window(image, window_size,step_size):    
+    x = np.arange(890, 1400, step_size[0])
+    y = np.arange(250, 730, step_size[1])
+    pair = np.mgrid[890:1400:step_size[0], 250:730:step_size[1],0.0: 6.28: 0.147].reshape(3,-1).T
+    for pts in pair:
+        xx = int(pts[0])
+        yy = int(pts[1])
+        tt = pts[2]
+        #crop = image[yy-halfy:yy+halfy+1,xx-halfx:xx+halfx+1]
+        crop = np.mgrid[yy-halfy:yy+halfy+1, xx-halfx:xx+halfx+1].reshape(2,-1).T
+        crop[:,[0, 1]] = crop[:,[1, 0]]
+        col = crop.shape[0]
+        newp = np.ones((col,3))
+        newp[:,:-1] = crop
+        transform = np.array([[np.cos(tt),-np.sin(tt),-xx*np.cos(tt)+xx+yy*np.sin(tt)],[np.sin(tt),np.cos(tt),-xx*np.sin(tt)-yy*np.cos(tt)+yy],[0,0,1]])
+        newp = fast_dot(transform,newp.T)
+        newp = newp[0:2,:]
+        newp = np.transpose(newp).astype(int)
+        imx = newp[:,0]
+        imy = newp[:,1]
+        newim = np.array(image[imy, imx]).reshape((window_size[1],window_size[0]))
+        #print(xx,yy,newim.shape)
+        yield (xx, yy, tt, newim)
 
 
 if __name__ == "__main__":

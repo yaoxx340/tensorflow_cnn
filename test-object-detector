@@ -16,4 +16,20 @@ os.system("python classifier.py -i {} --visualise".format(test_im_path))
 test_im_path = "test/37.png"
 os.system("python classifier.py -i {} --visualise".format(test_im_path))
 
+test_im_path = "test/39.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
 
+test_im_path = "test/49.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+test_im_path = "test/51.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+test_im_path = "test/53.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+test_im_path = "test/63.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
+
+test_im_path = "test/65.png"
+os.system("python classifier.py -i {} --visualise".format(test_im_path))
