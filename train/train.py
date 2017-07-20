@@ -7,9 +7,9 @@ import tensorflow as tf
 import numpy as np
 import time
 
-path='/home/yuan/Google Drive/Research/cv/CNN_detector/'
+path='/home/yaoxx340/CNN_detector/train/'
 
-model_path='/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt'
+model_path='/home/yaoxx340/CNN_detector/model.ckpt'
 
 w=100
 h=100
