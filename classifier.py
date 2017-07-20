@@ -94,8 +94,8 @@ if __name__ == "__main__":
     #clf = joblib.load(model_path)
     gpu_options = tf.GPUOptions(allow_growth=True)
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-        saver = tf.train.import_meta_graph('/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt.meta')
-        saver.restore(sess,tf.train.latest_checkpoint('/home/yuan/Google Drive/Research/cv/CNN_detector/'))
+        saver = tf.train.import_meta_graph('/home/yaoxx340/CNN_detector/model.ckpt.meta')
+        saver.restore(sess,tf.train.latest_checkpoint('/home/yaoxx340/CNN_detector/'))
         graph = tf.get_default_graph()
         xx = graph.get_tensor_by_name("x:0")
         logits = graph.get_tensor_by_name("logits_eval:0")
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         # Draw the detections
         cv2.rectangle(im, (x_tl-halfx, y_tl-halfy), (x_tl+halfx+1, y_tl+halfy+1), (0, 0, 0), thickness=2)
     #cv2.imshow("Raw Detections before NMS", im)
-    cv2.imwrite("/home/yuan/Google Drive/Research/cv/CNN_detector/result/"+str(strings)+"raw.png",im)
+    cv2.imwrite("/home/yaoxx340/CNN_detector/result/"+str(strings)+"raw.png",im)
     #cv2.waitKey(100)
 
 
@@ -178,5 +178,5 @@ if __name__ == "__main__":
         print(theta)
         cv2.polylines(clone,[pts1],True,(0,255,0))
     #cv2.imshow("Final Detections after applying NMS", clone)
-    cv2.imwrite("/home/yuan/Google Drive/Research/cv/CNN_detector/result/"+str(strings)+"final.png",clone)
+    cv2.imwrite("/home/yaoxx340/CNN_detector/result/"+str(strings)+"final.png",clone)
     #cv2.waitKey()
