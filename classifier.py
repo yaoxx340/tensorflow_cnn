@@ -32,9 +32,7 @@ def frange(x, y, jump):
     x += jump
 
 def sliding_window(image, window_size,step_size):    
-    x = np.arange(890, 1400, step_size[0])
-    y = np.arange(250, 730, step_size[1])
-    pair = np.mgrid[890:1400:step_size[0], 250:730:step_size[1],0.0: 6.28: 0.147].reshape(3,-1).T
+    pair = np.mgrid[890:1400:step_size[0], 250:730:step_size[1],0.0: 6.28: 5].reshape(3,-1).T
     for pts in pair:
         xx = int(pts[0])
         yy = int(pts[1])
@@ -52,6 +50,8 @@ def sliding_window(image, window_size,step_size):
         imx = newp[:,0]
         imy = newp[:,1]
         newim = np.array(image[imy, imx]).reshape((window_size[1],window_size[0]))
+        print(xx,yy,tt)
+        newim = read_one_image(newim)
         #print(xx,yy,newim.shape)
         yield (xx, yy, tt, newim)
 
@@ -72,20 +72,38 @@ if __name__ == "__main__":
     min_wdw_sz = (91, 161)
     halfx = (min_wdw_sz[0]-1)/2
     halfy = (min_wdw_sz[1]-1)/2
-    step_size = (10, 10)
+    step_size = (100, 100)
     downscale = args['downscale']
     visualise_det = args['visualise']
     detections = []
+    iter_ = sliding_window(img, min_wdw_sz, step_size)
+    image_batch = tf.placeholder(dtype=tf.float32, shape=[None, 100,100])
+    x_batch = tf.placeholder(dtype=tf.int32, shape=[None, ])
+    y_batch = tf.placeholder(dtype=tf.int32, shape=[None, ])
+    theta_batch = tf.placeholder(dtype=tf.float32, shape=[None, ])
+
+
     #clf = joblib.load(model_path)
     gpu_options = tf.GPUOptions(allow_growth=True)
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-        saver = tf.train.import_meta_graph('/home/yaoxx340/CNN_detector/model.ckpt.meta')
-        saver.restore(sess,tf.train.latest_checkpoint('/home/yaoxx340/CNN_detector/'))
+        saver = tf.train.import_meta_graph('/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt.meta')
+        saver.restore(sess,tf.train.latest_checkpoint('/home/yuan/Google Drive/Research/cv/CNN_detector/'))
         graph = tf.get_default_graph()
         xx = graph.get_tensor_by_name("x:0")
         logits = graph.get_tensor_by_name("logits_eval:0")
+        while next(iter_)!=None:
+            x, y, theta, image = next(iter_)
+            #print(images_batch.shape)
+            data = np.reshape(image, (1,100,100,1))
+            feed_dict = {xx:data}
+            classification_result = sess.run(logits,feed_dict)
+            output = tf.argmax(classification_result,1).eval()
+            if object_dict[output[0]] == 'mouse':
+                prob = classification_result[0][0]/(classification_result[0][0]+classification_result[0][1])
+                detections.append((x, y, theta, prob))
 
-        scale = 0
+        '''
+     
         # Downscale the image and iterate
         for im_scaled in pyramid_gaussian(img, downscale=downscale):
             # This list contains detections at the current scale
@@ -106,38 +124,27 @@ if __name__ == "__main__":
                 output = tf.argmax(classification_result,1).eval()
                 if object_dict[output[0]] == 'mouse':
                     prob = classification_result[0][0]/(classification_result[0][0]+classification_result[0][1])
-                    #print ("Detection:: Location -> ({}, {})".format(x, y))
-                    #print ("Scale ->  {} | Confidence Score {} \n".format(scale,prob))
                     detections.append((x, y, theta, prob,int(min_wdw_sz[0]*(downscale**scale)),int(min_wdw_sz[1]*(downscale**scale))))
                     cd.append(detections[-1])
-                # If visualize is set to true, display the working
-                # of the sliding window
-                #if visualise_det:
-                    #clone = im_scaled.copy()
-                    #for x1, y1,theta1,_, _, _  in cd:
-                        # Draw the detections at this scale
-                        #cv2.rectangle(clone, (x1-halfx, y1-halfy), (x1 + halfx+1, y1 +halfy+1), (0, 0, 0), thickness=2)
-                    #cv2.rectangle(clone, (x-halfx, y-halfy), (x + halfx+1, y +halfy+1), (255, 255, 255), thickness=2)
-                    #cv2.imshow("Sliding Window in Progress", clone)
-                    #cv2.waitKey(10)
-            # Move the the next scale
+   
             scale+=1
             break
+            '''
 
 
     clone = im.copy()
-    for (x_tl, y_tl, theta1,_, w, h) in detections:
+    for (x_tl, y_tl, theta1,_) in detections:
         # Draw the detections
         cv2.rectangle(im, (x_tl-halfx, y_tl-halfy), (x_tl+halfx+1, y_tl+halfy+1), (0, 0, 0), thickness=2)
     #cv2.imshow("Raw Detections before NMS", im)
-    cv2.imwrite("/home/yaoxx340/CNN_detector/result/"+str(strings)+"raw.png",im)
+    cv2.imwrite("/home/yuan/Google Drive/Research/cv/CNN_detector/result/"+str(strings)+"raw.png",im)
     #cv2.waitKey(100)
 
 
     detections = nms(detections)
 
     # Display the results after performing NMS
-    for (x_tl, y_tl, theta,_, ww, hh) in detections:
+    for (x_tl, y_tl, theta,_) in detections:
         lu = [x_tl-halfx,y_tl-halfy]
         ll = [x_tl-halfx,y_tl+halfy]
         rl = [x_tl+halfx,y_tl+halfy]
@@ -163,5 +170,5 @@ if __name__ == "__main__":
         print(theta)
         cv2.polylines(clone,[pts1],True,(0,255,0))
     #cv2.imshow("Final Detections after applying NMS", clone)
-    cv2.imwrite("/home/yaoxx340/CNN_detector/result/"+str(strings)+"final.png",clone)
+    cv2.imwrite("/home/yuan/Google Drive/Research/cv/CNN_detector/result/"+str(strings)+"final.png",clone)
     #cv2.waitKey()

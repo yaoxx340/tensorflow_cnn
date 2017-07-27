@@ -3,8 +3,8 @@ import tensorflow as tf
 import numpy as np
 
 
-path1 = "/home/yuan/Google Drive/Research/cv/CNN_detector/mouse/18.png"
- 
+path1 = "/home/yuan/Google Drive/Research/cv/CNN_detector/train/mouse/18.png"
+path2 = "/home/yuan/Google Drive/Research/cv/CNN_detector/train/bg/33.png" 
 
 object_dict = {0:'mouse',1:'bg'}
 
@@ -20,9 +20,12 @@ def read_one_image(path):
 with tf.Session() as sess:
     data = []
     data1 = read_one_image(path1)
- 
+    data2 = read_one_image(path2)
     data.append(data1)
-    data=np.reshape(data,(1,100,100,1))
+    data.append(data2)
+    #for i in range(5):
+        #data.append(data1)
+    data=np.reshape(data,(2,100,100,1))
  
 
     saver = tf.train.import_meta_graph('/home/yuan/Google Drive/Research/cv/CNN_detector/model.ckpt.meta')
@@ -37,11 +40,15 @@ with tf.Session() as sess:
     classification_result = sess.run(logits,feed_dict)
 
 
-    print(classification_result[0][1])
+    print(classification_result)
+    #print(classification_result[:,0])
+    #print(classification_result[:,0]+classification_result[:,1])
+    prob = classification_result[:,0]/(classification_result[:,0]+classification_result[:,1])
+    print(prob[0],prob[1])
 
-    print(tf.argmax(classification_result,1).eval()[0])
+    #print(tf.argmax(classification_result,1).eval()[0])
 
-    output = []
-    output = tf.argmax(classification_result,1).eval()
-    for i in range(len(output)):
-        print("no",i+1,"predixtion:"+object_dict[output[i]])
+    #output = []
+    #output = tf.argmax(classification_result,1).eval()
+    #for i in range(len(output)):
+        #print("no",i+1,"predixtion:"+object_dict[output[i]])
