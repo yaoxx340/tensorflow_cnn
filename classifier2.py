@@ -38,8 +38,8 @@ step_size = (10, 10)
 #length = tf.reshape(length,(1,1))
 
 
-filename = "test/95.png"
-strings = filename[-6:-4]
+filename = "test/103.png"
+strings = filename[-7:-4]
 im = imread(filename)
 img = imread(filename,as_grey=True)
 #tf_image = tf.convert_to_tensor(img)
