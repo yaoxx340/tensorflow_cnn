@@ -38,7 +38,7 @@ step_size = (10, 10)
 #length = tf.reshape(length,(1,1))
 
 
-filename = "test/151.png"
+filename = "test/181.png"
 strings = filename[-7:-4]
 im = imread(filename)
 img = imread(filename,as_grey=True)
