@@ -38,8 +38,8 @@ step_size = (10, 10)
 #length = tf.reshape(length,(1,1))
 
 
-filename = "test/3.png"
-strings = filename[-5:-4]
+filename = "test/73.png"
+strings = filename[-6:-4]
 im = imread(filename)
 img = imread(filename,as_grey=True)
 #tf_image = tf.convert_to_tensor(img)
@@ -81,7 +81,7 @@ def sliding_window(image, window_size,step_size):
 
 sliding_window(img, min_wdw_sz, step_size)
 length = len(detections)
-f = lambda A, n=500: [A[i:i+n] for i in range(0, len(A), n)]
+f = lambda A, n=200: [A[i:i+n] for i in range(0, len(A), n)]
 lst_detection = f(detections)
 lst_locations = f(locations)
 max_prob = []
